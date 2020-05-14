@@ -30,6 +30,10 @@ class RenderReactGrid extends RenderBox
         ContainerRenderObjectMixin<RenderBox, ReactGridParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox, ReactGridParentData> {
   RenderReactGrid({
+    @required this.crossAxisCount,
+    this.mainAxisSpacing,
+    this.crossAxisSpacing,
+    this.gridAspectRatio,
     List<RenderBox> children,
     AlignmentGeometry alignment = AlignmentDirectional.topStart,
     TextDirection textDirection,
@@ -41,6 +45,19 @@ class RenderReactGrid extends RenderBox
         _overflow = overflow {
     addAll(children);
   }
+
+  final int crossAxisCount;
+
+  final double mainAxisSpacing;
+
+  final double crossAxisSpacing;
+
+  /// gridAspectRatio == crossAxisStride / mainAxisStride
+  final double gridAspectRatio;
+
+  double mainAxisStride;
+
+  double crossAxisStride;
 
   bool _hasVisualOverflow = false;
 
@@ -181,6 +198,8 @@ class RenderReactGrid extends RenderBox
     RenderBox child = firstChild;
 
     size = constraints.biggest;
+    crossAxisStride = size.width / crossAxisCount;
+    mainAxisStride = crossAxisStride / gridAspectRatio;
 
     assert(size.isFinite);
 

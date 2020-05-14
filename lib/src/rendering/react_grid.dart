@@ -216,6 +216,21 @@ class RenderReactGrid extends RenderBox
       final ReactGridParentData childParentData =
           child.parentData as ReactGridParentData;
 
+      childParentData.left =
+          crossAxisStride * childParentData.crossAxisOffsetCellCount +
+              crossAxisSpacing / 2;
+
+      childParentData.top =
+          mainAxisStride * childParentData.mainAxisOffsetCellCount +
+              mainAxisSpacing / 2;
+
+      childParentData.width =
+          childParentData.crossAxisCellCount * crossAxisStride -
+              crossAxisSpacing;
+
+      childParentData.height =
+          childParentData.mainAxisCellCount * mainAxisStride - mainAxisSpacing;
+
       _hasVisualOverflow = layoutReactPositionedChild(
               child, childParentData, size, _resolvedAlignment) ||
           _hasVisualOverflow;

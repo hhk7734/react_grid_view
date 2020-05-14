@@ -67,20 +67,20 @@ class ReactGrid extends MultiChildRenderObjectWidget {
 class ReactPositioned extends ParentDataWidget<ReactGridParentData> {
   const ReactPositioned({
     Key key,
-    @required this.left,
-    @required this.top,
-    @required this.width,
-    @required this.height,
+    @required this.crossAxisOffsetCellCount,
+    @required this.mainAxisOffsetCellCount,
+    @required this.crossAxisCellCount,
+    @required this.mainAxisCellCount,
     @required Widget child,
   }) : super(key: key, child: child);
 
-  final double left;
+  final int crossAxisOffsetCellCount;
 
-  final double top;
+  final int mainAxisOffsetCellCount;
 
-  final double width;
+  final int crossAxisCellCount;
 
-  final double height;
+  final int mainAxisCellCount;
 
   @override
   void applyParentData(RenderObject renderObject) {
@@ -89,23 +89,23 @@ class ReactPositioned extends ParentDataWidget<ReactGridParentData> {
         renderObject.parentData as ReactGridParentData;
     bool needsLayout = false;
 
-    if (parentData.left != left) {
-      parentData.left = left;
+    if (parentData.crossAxisOffsetCellCount != crossAxisOffsetCellCount) {
+      parentData.crossAxisOffsetCellCount = crossAxisOffsetCellCount;
       needsLayout = true;
     }
 
-    if (parentData.top != top) {
-      parentData.top = top;
+    if (parentData.mainAxisOffsetCellCount != mainAxisOffsetCellCount) {
+      parentData.mainAxisOffsetCellCount = mainAxisOffsetCellCount;
       needsLayout = true;
     }
 
-    if (parentData.width != width) {
-      parentData.width = width;
+    if (parentData.crossAxisCellCount != crossAxisCellCount) {
+      parentData.crossAxisCellCount = crossAxisCellCount;
       needsLayout = true;
     }
 
-    if (parentData.height != height) {
-      parentData.height = height;
+    if (parentData.mainAxisCellCount != mainAxisCellCount) {
+      parentData.mainAxisCellCount = mainAxisCellCount;
       needsLayout = true;
     }
 
@@ -121,9 +121,15 @@ class ReactPositioned extends ParentDataWidget<ReactGridParentData> {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(DoubleProperty('left', left, defaultValue: null));
-    properties.add(DoubleProperty('top', top, defaultValue: null));
-    properties.add(DoubleProperty('width', width, defaultValue: null));
-    properties.add(DoubleProperty('height', height, defaultValue: null));
+    properties.add(IntProperty(
+        'crossAxisOffsetCellCount', crossAxisOffsetCellCount,
+        defaultValue: null));
+    properties.add(IntProperty(
+        'mainAxisOffsetCellCount', mainAxisOffsetCellCount,
+        defaultValue: null));
+    properties.add(IntProperty('crossAxisCellCount', crossAxisCellCount,
+        defaultValue: null));
+    properties.add(IntProperty('mainAxisCellCount', mainAxisCellCount,
+        defaultValue: null));
   }
 }

@@ -3,6 +3,14 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 class ReactGridParentData extends ContainerBoxParentData<RenderBox> {
+  int crossAxisOffsetCellCount;
+
+  int mainAxisOffsetCellCount;
+
+  int crossAxisCellCount;
+
+  int mainAxisCellCount;
+
   double top;
 
   double left;

@@ -50,24 +50,16 @@ class ReactGrid extends MultiChildRenderObjectWidget {
 class ReactPositioned extends ParentDataWidget<ReactGridParentData> {
   const ReactPositioned({
     Key key,
-    this.left,
-    this.top,
-    this.right,
-    this.bottom,
-    this.width,
-    this.height,
+    @required this.left,
+    @required this.top,
+    @required this.width,
+    @required this.height,
     @required Widget child,
-  })  : assert(left == null || right == null || width == null),
-        assert(top == null || bottom == null || height == null),
-        super(key: key, child: child);
+  }) : super(key: key, child: child);
 
   final double left;
 
   final double top;
-
-  final double right;
-
-  final double bottom;
 
   final double width;
 
@@ -87,16 +79,6 @@ class ReactPositioned extends ParentDataWidget<ReactGridParentData> {
 
     if (parentData.top != top) {
       parentData.top = top;
-      needsLayout = true;
-    }
-
-    if (parentData.right != right) {
-      parentData.right = right;
-      needsLayout = true;
-    }
-
-    if (parentData.bottom != bottom) {
-      parentData.bottom = bottom;
       needsLayout = true;
     }
 
@@ -124,8 +106,6 @@ class ReactPositioned extends ParentDataWidget<ReactGridParentData> {
     super.debugFillProperties(properties);
     properties.add(DoubleProperty('left', left, defaultValue: null));
     properties.add(DoubleProperty('top', top, defaultValue: null));
-    properties.add(DoubleProperty('right', right, defaultValue: null));
-    properties.add(DoubleProperty('bottom', bottom, defaultValue: null));
     properties.add(DoubleProperty('width', width, defaultValue: null));
     properties.add(DoubleProperty('height', height, defaultValue: null));
   }

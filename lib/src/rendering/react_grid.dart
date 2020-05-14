@@ -5,30 +5,16 @@ import 'package:flutter/widgets.dart';
 class ReactGridParentData extends ContainerBoxParentData<RenderBox> {
   double top;
 
-  double right;
-
-  double bottom;
-
   double left;
 
   double width;
 
   double height;
 
-  RelativeRect get rect => RelativeRect.fromLTRB(left, top, right, bottom);
-  set rect(RelativeRect value) {
-    top = value.top;
-    right = value.right;
-    bottom = value.bottom;
-    left = value.left;
-  }
-
   @override
   String toString() {
     final List<String> values = <String>[
       if (top != null) 'top=${debugFormatDouble(top)}',
-      if (right != null) 'right=${debugFormatDouble(right)}',
-      if (bottom != null) 'bottom=${debugFormatDouble(bottom)}',
       if (left != null) 'left=${debugFormatDouble(left)}',
       if (width != null) 'width=${debugFormatDouble(width)}',
       if (height != null) 'height=${debugFormatDouble(height)}',
@@ -149,43 +135,25 @@ class RenderReactGrid extends RenderBox
       ReactGridParentData childParentData, Size size, Alignment alignment) {
     assert(child.parentData == childParentData);
 
+    /// size is size of ReactGrid
+
     bool hasVisualOverflow = false;
     BoxConstraints childConstraints = const BoxConstraints();
 
-    if (childParentData.left != null && childParentData.right != null)
-      childConstraints = childConstraints.tighten(
-          width: size.width - childParentData.right - childParentData.left);
-    else if (childParentData.width != null)
-      childConstraints = childConstraints.tighten(width: childParentData.width);
-
-    if (childParentData.top != null && childParentData.bottom != null)
-      childConstraints = childConstraints.tighten(
-          height: size.height - childParentData.bottom - childParentData.top);
-    else if (childParentData.height != null)
-      childConstraints =
-          childConstraints.tighten(height: childParentData.height);
+    childConstraints = childConstraints.tighten(
+      width: childParentData.width,
+      height: childParentData.height,
+    );
 
     child.layout(childConstraints, parentUsesSize: true);
 
     double x;
-    if (childParentData.left != null) {
-      x = childParentData.left;
-    } else if (childParentData.right != null) {
-      x = size.width - childParentData.right - child.size.width;
-    } else {
-      x = alignment.alongOffset(size - child.size as Offset).dx;
-    }
+    x = childParentData.left;
 
     if (x < 0.0 || x + child.size.width > size.width) hasVisualOverflow = true;
 
     double y;
-    if (childParentData.top != null) {
-      y = childParentData.top;
-    } else if (childParentData.bottom != null) {
-      y = size.height - childParentData.bottom - child.size.height;
-    } else {
-      y = alignment.alongOffset(size - child.size as Offset).dy;
-    }
+    y = childParentData.top;
 
     if (y < 0.0 || y + child.size.height > size.height)
       hasVisualOverflow = true;

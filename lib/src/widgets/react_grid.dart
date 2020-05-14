@@ -7,10 +7,14 @@ import '../rendering/react_grid.dart';
 class ReactGrid extends MultiChildRenderObjectWidget {
   ReactGrid({
     Key key,
+    @required this.crossAxisCount,
+    this.mainAxisSpacing = 0.0,
+    this.crossAxisSpacing = 0.0,
+    this.gridAspectRatio = 1.0,
+    List<Widget> children = const <Widget>[],
     this.alignment = AlignmentDirectional.topStart,
     this.textDirection,
     this.overflow = Overflow.clip,
-    List<Widget> children = const <Widget>[],
   }) : super(key: key, children: children);
 
   final AlignmentGeometry alignment;
@@ -19,9 +23,22 @@ class ReactGrid extends MultiChildRenderObjectWidget {
 
   final Overflow overflow;
 
+  final int crossAxisCount;
+
+  final double mainAxisSpacing;
+
+  final double crossAxisSpacing;
+
+  /// gridAspectRatio == crossAxisStride / mainAxisStride
+  final double gridAspectRatio;
+
   @override
   RenderReactGrid createRenderObject(BuildContext context) {
     return RenderReactGrid(
+      crossAxisCount: crossAxisCount,
+      mainAxisSpacing: mainAxisSpacing,
+      crossAxisSpacing: crossAxisSpacing,
+      gridAspectRatio: gridAspectRatio,
       alignment: alignment,
       textDirection: textDirection ?? Directionality.of(context),
       overflow: overflow,

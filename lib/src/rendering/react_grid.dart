@@ -215,11 +215,6 @@ class RenderReactGrid extends RenderBox
   void performLayout() {
     final BoxConstraints constraints = this.constraints;
     _hasVisualOverflow = false;
-    if (childCount == 0) {
-      size = constraints.biggest;
-      assert(size.isFinite);
-      return;
-    }
 
     // double width = constraints.minWidth;
     // double height = constraints.minHeight;

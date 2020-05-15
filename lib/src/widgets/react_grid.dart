@@ -48,6 +48,10 @@ class ReactGrid extends MultiChildRenderObjectWidget {
   @override
   void updateRenderObject(BuildContext context, RenderReactGrid renderObject) {
     renderObject
+      ..crossAxisCount = crossAxisCount
+      ..mainAxisSpacing = mainAxisSpacing
+      ..crossAxisSpacing = crossAxisSpacing
+      ..gridAspectRatio = gridAspectRatio
       ..alignment = alignment
       ..textDirection = textDirection ?? Directionality.of(context)
       ..overflow = overflow;

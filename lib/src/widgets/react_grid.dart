@@ -60,6 +60,10 @@ class ReactGrid extends MultiChildRenderObjectWidget {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
+    properties.add(IntProperty('crossAxisCount', crossAxisCount));
+    properties.add(DoubleProperty('mainAxisSpacing', mainAxisSpacing));
+    properties.add(DoubleProperty('crossAxisSpacing', crossAxisSpacing));
+    properties.add(DoubleProperty('gridAspectRatio', gridAspectRatio));
     properties
         .add(DiagnosticsProperty<AlignmentGeometry>('alignment', alignment));
     properties.add(EnumProperty<TextDirection>('textDirection', textDirection,

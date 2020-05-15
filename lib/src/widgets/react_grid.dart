@@ -72,8 +72,45 @@ class ReactGrid extends MultiChildRenderObjectWidget {
   }
 }
 
-class ReactPositioned extends ParentDataWidget<ReactGridParentData> {
+class ReactPositioned extends StatefulWidget {
   const ReactPositioned({
+    Key key,
+    @required this.crossAxisOffsetCellCount,
+    @required this.mainAxisOffsetCellCount,
+    @required this.crossAxisCellCount,
+    @required this.mainAxisCellCount,
+    @required this.child,
+  }) : super(key: key);
+
+  final int crossAxisOffsetCellCount;
+
+  final int mainAxisOffsetCellCount;
+
+  final int crossAxisCellCount;
+
+  final int mainAxisCellCount;
+
+  final Widget child;
+
+  @override
+  _ReactPositionedState createState() => _ReactPositionedState();
+}
+
+class _ReactPositionedState extends State<ReactPositioned> {
+  @override
+  Widget build(BuildContext context) {
+    return _WrapReactPositioned(
+      crossAxisOffsetCellCount: widget.crossAxisOffsetCellCount,
+      mainAxisOffsetCellCount: widget.mainAxisOffsetCellCount,
+      crossAxisCellCount: widget.crossAxisCellCount,
+      mainAxisCellCount: widget.mainAxisCellCount,
+      child: widget.child,
+    );
+  }
+}
+
+class _WrapReactPositioned extends ParentDataWidget<ReactGridParentData> {
+  const _WrapReactPositioned({
     Key key,
     @required this.crossAxisOffsetCellCount,
     @required this.mainAxisOffsetCellCount,

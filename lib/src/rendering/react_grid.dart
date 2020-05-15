@@ -70,25 +70,13 @@ class RenderReactGrid extends RenderBox
       child.parentData = ReactGridParentData();
   }
 
-  Alignment _resolvedAlignment;
-
-  void _resolve() {
-    if (_resolvedAlignment != null) return;
-    _resolvedAlignment = alignment.resolve(textDirection);
-  }
-
-  void _markNeedResolution() {
-    _resolvedAlignment = null;
-    markNeedsLayout();
-  }
-
   int get crossAxisCount => _crossAxisCount;
   int _crossAxisCount;
   set crossAxisCount(int value) {
     assert(value > 0);
     if (_crossAxisCount == value) return;
     _crossAxisCount = value;
-    _markNeedResolution();
+    markNeedsLayout();
   }
 
   double get mainAxisSpacing => _mainAxisSpacing;
@@ -97,7 +85,7 @@ class RenderReactGrid extends RenderBox
     assert(value >= 0);
     if (_mainAxisSpacing == value) return;
     _mainAxisSpacing = value;
-    _markNeedResolution();
+    markNeedsLayout();
   }
 
   double get crossAxisSpacing => _crossAxisSpacing;
@@ -106,7 +94,7 @@ class RenderReactGrid extends RenderBox
     assert(value >= 0);
     if (_crossAxisSpacing == value) return;
     _crossAxisSpacing = value;
-    _markNeedResolution();
+    markNeedsLayout();
   }
 
   /// gridAspectRatio == crossAxisStride / mainAxisStride
@@ -116,7 +104,7 @@ class RenderReactGrid extends RenderBox
     assert(value > 0);
     if (_gridAspectRatio == value) return;
     _gridAspectRatio = value;
-    _markNeedResolution();
+    markNeedsLayout();
   }
 
   AlignmentGeometry get alignment => _alignment;
@@ -125,7 +113,7 @@ class RenderReactGrid extends RenderBox
     assert(value != null);
     if (_alignment == value) return;
     _alignment = value;
-    _markNeedResolution();
+    markNeedsLayout();
   }
 
   TextDirection get textDirection => _textDirection;
@@ -133,7 +121,7 @@ class RenderReactGrid extends RenderBox
   set textDirection(TextDirection value) {
     if (_textDirection == value) return;
     _textDirection = value;
-    _markNeedResolution();
+    markNeedsLayout();
   }
 
   Overflow get overflow => _overflow;
@@ -188,8 +176,11 @@ class RenderReactGrid extends RenderBox
     return defaultComputeDistanceToHighestActualBaseline(baseline);
   }
 
-  static bool layoutReactPositionedChild(RenderBox child,
-      ReactGridParentData childParentData, Size size, Alignment alignment) {
+  static bool layoutReactPositionedChild(
+    RenderBox child,
+    ReactGridParentData childParentData,
+    Size size,
+  ) {
     assert(child.parentData == childParentData);
 
     /// size is size of ReactGrid
@@ -223,8 +214,6 @@ class RenderReactGrid extends RenderBox
   @override
   void performLayout() {
     final BoxConstraints constraints = this.constraints;
-    _resolve();
-    assert(_resolvedAlignment != null);
     _hasVisualOverflow = false;
     if (childCount == 0) {
       size = constraints.biggest;
@@ -263,9 +252,9 @@ class RenderReactGrid extends RenderBox
       childParentData.height =
           childParentData.mainAxisCellCount * mainAxisStride - mainAxisSpacing;
 
-      _hasVisualOverflow = layoutReactPositionedChild(
-              child, childParentData, size, _resolvedAlignment) ||
-          _hasVisualOverflow;
+      _hasVisualOverflow =
+          layoutReactPositionedChild(child, childParentData, size) ||
+              _hasVisualOverflow;
 
       assert(child.parentData == childParentData);
       child = childParentData.nextSibling;

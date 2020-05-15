@@ -38,30 +38,25 @@ class RenderReactGrid extends RenderBox
         ContainerRenderObjectMixin<RenderBox, ReactGridParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox, ReactGridParentData> {
   RenderReactGrid({
-    @required this.crossAxisCount,
-    this.mainAxisSpacing,
-    this.crossAxisSpacing,
-    this.gridAspectRatio,
+    @required int crossAxisCount,
+    double mainAxisSpacing,
+    double crossAxisSpacing,
+    double gridAspectRatio,
     List<RenderBox> children,
     AlignmentGeometry alignment = AlignmentDirectional.topStart,
     TextDirection textDirection,
     Overflow overflow = Overflow.clip,
   })  : assert(alignment != null),
         assert(overflow != null),
+        _crossAxisCount = crossAxisCount,
+        _mainAxisSpacing = mainAxisSpacing,
+        _crossAxisSpacing = crossAxisSpacing,
+        _gridAspectRatio = gridAspectRatio,
         _alignment = alignment,
         _textDirection = textDirection,
         _overflow = overflow {
     addAll(children);
   }
-
-  final int crossAxisCount;
-
-  final double mainAxisSpacing;
-
-  final double crossAxisSpacing;
-
-  /// gridAspectRatio == crossAxisStride / mainAxisStride
-  final double gridAspectRatio;
 
   double mainAxisStride;
 
@@ -85,6 +80,43 @@ class RenderReactGrid extends RenderBox
   void _markNeedResolution() {
     _resolvedAlignment = null;
     markNeedsLayout();
+  }
+
+  int get crossAxisCount => _crossAxisCount;
+  int _crossAxisCount;
+  set crossAxisCount(int value) {
+    assert(value > 0);
+    if (_crossAxisCount == value) return;
+    _crossAxisCount = value;
+    _markNeedResolution();
+  }
+
+  double get mainAxisSpacing => _mainAxisSpacing;
+  double _mainAxisSpacing;
+  set mainAxisSpacing(double value) {
+    assert(value >= 0);
+    if (_mainAxisSpacing == value) return;
+    _mainAxisSpacing = value;
+    _markNeedResolution();
+  }
+
+  double get crossAxisSpacing => _crossAxisSpacing;
+  double _crossAxisSpacing;
+  set crossAxisSpacing(double value) {
+    assert(value >= 0);
+    if (_crossAxisSpacing == value) return;
+    _crossAxisSpacing = value;
+    _markNeedResolution();
+  }
+
+  /// gridAspectRatio == crossAxisStride / mainAxisStride
+  double get gridAspectRatio => _gridAspectRatio;
+  double _gridAspectRatio;
+  set gridAspectRatio(double value) {
+    assert(value > 0);
+    if (_gridAspectRatio == value) return;
+    _gridAspectRatio = value;
+    _markNeedResolution();
   }
 
   AlignmentGeometry get alignment => _alignment;
@@ -267,6 +299,10 @@ class RenderReactGrid extends RenderBox
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
+    properties.add(IntProperty('crossAxisCount', crossAxisCount));
+    properties.add(DoubleProperty('mainAxisSpacing', mainAxisSpacing));
+    properties.add(DoubleProperty('crossAxisSpacing', crossAxisSpacing));
+    properties.add(DoubleProperty('gridAspectRatio', gridAspectRatio));
     properties
         .add(DiagnosticsProperty<AlignmentGeometry>('alignment', alignment));
     properties.add(EnumProperty<TextDirection>('textDirection', textDirection));

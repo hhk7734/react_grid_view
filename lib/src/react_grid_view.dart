@@ -62,6 +62,8 @@ class ReactGridView extends StatefulWidget {
 }
 
 class _ReactGridViewState extends State<ReactGridView> {
+  ScrollController controller;
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -77,6 +79,10 @@ class _ReactGridViewState extends State<ReactGridView> {
       if (_height > height) height = _height;
     });
 
+    controller = widget.controller != null
+        ? widget.controller
+        : PrimaryScrollController.of(context);
+
     return SingleChildScrollView(
       key: widget.key,
       scrollDirection: widget.scrollDirection,
@@ -84,7 +90,7 @@ class _ReactGridViewState extends State<ReactGridView> {
       padding: widget.padding,
       primary: widget.primary,
       physics: widget.physics,
-      controller: widget.controller,
+      controller: controller,
       dragStartBehavior: widget.dragStartBehavior,
       child: Container(
         width: width,
@@ -99,6 +105,7 @@ class _ReactGridViewState extends State<ReactGridView> {
           alignment: widget.alignment,
           textDirection: widget.textDirection ?? Directionality.of(context),
           overflow: widget.overflow,
+          controller: controller,
         ),
       ),
     );

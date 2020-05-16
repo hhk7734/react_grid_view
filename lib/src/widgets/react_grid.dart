@@ -15,6 +15,7 @@ class ReactGrid extends MultiChildRenderObjectWidget {
     this.alignment = AlignmentDirectional.topStart,
     this.textDirection,
     this.overflow = Overflow.clip,
+    this.controller,
   }) : super(key: key, children: children);
 
   final AlignmentGeometry alignment;
@@ -32,6 +33,8 @@ class ReactGrid extends MultiChildRenderObjectWidget {
   /// gridAspectRatio == crossAxisStride / mainAxisStride
   final double gridAspectRatio;
 
+  final ScrollController controller;
+
   @override
   RenderReactGrid createRenderObject(BuildContext context) {
     return RenderReactGrid(
@@ -42,6 +45,7 @@ class ReactGrid extends MultiChildRenderObjectWidget {
       alignment: alignment,
       textDirection: textDirection ?? Directionality.of(context),
       overflow: overflow,
+      controller: controller,
     );
   }
 
@@ -97,6 +101,53 @@ class ReactPositioned extends StatefulWidget {
 }
 
 class _ReactPositionedState extends State<ReactPositioned> {
+  double left;
+
+  double top;
+
+  Widget child;
+
+  double width;
+
+  double height;
+
+  @override
+  void initState() {
+    super.initState();
+    child = GestureDetector(
+      child: widget.child,
+      onLongPressStart: (details) {
+        RenderObject renderObject = context.findRenderObject();
+        ReactGridParentData parentData = renderObject.parentData;
+        parentData.onDragging = true;
+        parentData.left = details.globalPosition.dx - parentData.width / 2;
+        left = parentData.left;
+        parentData.top = details.globalPosition.dy -
+            parentData.height / 2 +
+            parentData.controller.offset;
+        top = parentData.top;
+        setState(() {});
+      },
+      onLongPressMoveUpdate: (details) {
+        RenderObject renderObject = context.findRenderObject();
+        ReactGridParentData parentData = renderObject.parentData;
+        parentData.left = details.globalPosition.dx - parentData.width / 2;
+        left = parentData.left;
+        parentData.top = details.globalPosition.dy -
+            parentData.height / 2 +
+            parentData.controller.offset;
+        top = parentData.top;
+        setState(() {});
+      },
+      onLongPressEnd: (details) {
+        RenderObject renderObject = context.findRenderObject();
+        ReactGridParentData parentData = renderObject.parentData;
+        parentData.onDragging = false;
+        setState(() {});
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return _WrapReactPositioned(
@@ -104,7 +155,11 @@ class _ReactPositionedState extends State<ReactPositioned> {
       mainAxisOffsetCellCount: widget.mainAxisOffsetCellCount,
       crossAxisCellCount: widget.crossAxisCellCount,
       mainAxisCellCount: widget.mainAxisCellCount,
-      child: widget.child,
+      left: left,
+      top: top,
+      width: width,
+      height: height,
+      child: child,
     );
   }
 }
@@ -116,6 +171,10 @@ class _WrapReactPositioned extends ParentDataWidget<ReactGridParentData> {
     @required this.mainAxisOffsetCellCount,
     @required this.crossAxisCellCount,
     @required this.mainAxisCellCount,
+    @required this.left,
+    @required this.top,
+    @required this.width,
+    @required this.height,
     @required Widget child,
   }) : super(key: key, child: child);
 
@@ -127,30 +186,61 @@ class _WrapReactPositioned extends ParentDataWidget<ReactGridParentData> {
 
   final int mainAxisCellCount;
 
+  final double left;
+
+  final double top;
+
+  final double width;
+
+  final double height;
+
+  /// Write the current data of this widget into the given render object's
+  /// parent data.
+  ///
+  /// The framework calls this function whenever it detects that the
+  /// [RenderObject] associated with the [child] has outdated
+  /// [RenderObject.parentData].
   @override
   void applyParentData(RenderObject renderObject) {
     assert(renderObject.parentData is ReactGridParentData);
-    final ReactGridParentData parentData =
+    final ReactGridParentData oldParentData =
         renderObject.parentData as ReactGridParentData;
     bool needsLayout = false;
 
-    if (parentData.crossAxisOffsetCellCount != crossAxisOffsetCellCount) {
-      parentData.crossAxisOffsetCellCount = crossAxisOffsetCellCount;
+    if (oldParentData.crossAxisOffsetCellCount != crossAxisOffsetCellCount) {
+      oldParentData.crossAxisOffsetCellCount = crossAxisOffsetCellCount;
       needsLayout = true;
     }
 
-    if (parentData.mainAxisOffsetCellCount != mainAxisOffsetCellCount) {
-      parentData.mainAxisOffsetCellCount = mainAxisOffsetCellCount;
+    if (oldParentData.mainAxisOffsetCellCount != mainAxisOffsetCellCount) {
+      oldParentData.mainAxisOffsetCellCount = mainAxisOffsetCellCount;
       needsLayout = true;
     }
 
-    if (parentData.crossAxisCellCount != crossAxisCellCount) {
-      parentData.crossAxisCellCount = crossAxisCellCount;
+    if (oldParentData.crossAxisCellCount != crossAxisCellCount) {
+      oldParentData.crossAxisCellCount = crossAxisCellCount;
       needsLayout = true;
     }
 
-    if (parentData.mainAxisCellCount != mainAxisCellCount) {
-      parentData.mainAxisCellCount = mainAxisCellCount;
+    if (oldParentData.mainAxisCellCount != mainAxisCellCount) {
+      oldParentData.mainAxisCellCount = mainAxisCellCount;
+      needsLayout = true;
+    }
+
+    if (oldParentData.left != left) {
+      oldParentData.left = left;
+      needsLayout = true;
+    }
+    if (oldParentData.top != top) {
+      oldParentData.top = top;
+      needsLayout = true;
+    }
+    if (oldParentData.width != width) {
+      oldParentData.width = width;
+      needsLayout = true;
+    }
+    if (oldParentData.width != width) {
+      oldParentData.width = width;
       needsLayout = true;
     }
 

@@ -3,6 +3,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 class ReactGridParentData extends ContainerBoxParentData<RenderBox> {
+  ReactGridParentData(this.controller);
+
   int crossAxisOffsetCellCount;
 
   int mainAxisOffsetCellCount;
@@ -18,6 +20,10 @@ class ReactGridParentData extends ContainerBoxParentData<RenderBox> {
   double width;
 
   double height;
+
+  bool onDragging = false;
+
+  ScrollController controller;
 
   @override
   String toString() {
@@ -46,6 +52,7 @@ class RenderReactGrid extends RenderBox
     AlignmentGeometry alignment = AlignmentDirectional.topStart,
     TextDirection textDirection,
     Overflow overflow = Overflow.clip,
+    this.controller,
   })  : assert(alignment != null),
         assert(overflow != null),
         _crossAxisCount = crossAxisCount,
@@ -58,6 +65,8 @@ class RenderReactGrid extends RenderBox
     addAll(children);
   }
 
+  final ScrollController controller;
+
   double mainAxisStride;
 
   double crossAxisStride;
@@ -66,8 +75,9 @@ class RenderReactGrid extends RenderBox
 
   @override
   void setupParentData(RenderBox child) {
-    if (child.parentData is! ReactGridParentData)
-      child.parentData = ReactGridParentData();
+    if (child.parentData is! ReactGridParentData) {
+      child.parentData = ReactGridParentData(controller);
+    }
   }
 
   int get crossAxisCount => _crossAxisCount;
@@ -228,17 +238,19 @@ class RenderReactGrid extends RenderBox
     assert(size.isFinite);
 
     child = firstChild;
+
     while (child != null) {
       final ReactGridParentData childParentData =
           child.parentData as ReactGridParentData;
+      if (!childParentData.onDragging) {
+        childParentData.left =
+            crossAxisStride * childParentData.crossAxisOffsetCellCount +
+                crossAxisSpacing / 2;
 
-      childParentData.left =
-          crossAxisStride * childParentData.crossAxisOffsetCellCount +
-              crossAxisSpacing / 2;
-
-      childParentData.top =
-          mainAxisStride * childParentData.mainAxisOffsetCellCount +
-              mainAxisSpacing / 2;
+        childParentData.top =
+            mainAxisStride * childParentData.mainAxisOffsetCellCount +
+                mainAxisSpacing / 2;
+      }
 
       childParentData.width =
           childParentData.crossAxisCellCount * crossAxisStride -

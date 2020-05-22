@@ -11,6 +11,8 @@ class ReactGridParentData extends ContainerBoxParentData<RenderBox> {
 
   int mainAxisCellCount;
 
+  // offest(left, top)
+
   double width;
 
   double height;
@@ -158,9 +160,6 @@ class RenderReactGrid extends RenderBox
   @override
   void performLayout() {
     final BoxConstraints constraints = this.constraints;
-
-    // double width = constraints.minWidth;
-    // double height = constraints.minHeight;
 
     RenderBox child = firstChild;
 

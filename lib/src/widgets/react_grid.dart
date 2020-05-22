@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/foundation.dart';
 
-import '../rendering/react_grid.dart';
+import '../rendering/render_react_grid.dart';
 
 part './react_grid_element.dart';
 

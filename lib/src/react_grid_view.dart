@@ -22,7 +22,6 @@ class ReactGridView extends StatefulWidget {
     this.children = const <Widget>[],
     this.alignment = AlignmentDirectional.topStart,
     this.textDirection,
-    this.overflow = Overflow.clip,
   }) : super(key: key);
 
   final Key key;
@@ -54,8 +53,6 @@ class ReactGridView extends StatefulWidget {
   final AlignmentGeometry alignment;
 
   final TextDirection textDirection;
-
-  final Overflow overflow;
 
   @override
   _ReactGridViewState createState() => _ReactGridViewState();
@@ -98,7 +95,6 @@ class _ReactGridViewState extends State<ReactGridView> {
           children: widget.children,
           alignment: widget.alignment,
           textDirection: widget.textDirection ?? Directionality.of(context),
-          overflow: widget.overflow,
         ),
       ),
     );

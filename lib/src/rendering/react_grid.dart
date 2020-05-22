@@ -11,10 +11,6 @@ class ReactGridParentData extends ContainerBoxParentData<RenderBox> {
 
   int mainAxisCellCount;
 
-  double top;
-
-  double left;
-
   double width;
 
   double height;
@@ -22,8 +18,6 @@ class ReactGridParentData extends ContainerBoxParentData<RenderBox> {
   @override
   String toString() {
     final List<String> values = <String>[
-      if (top != null) 'top=${debugFormatDouble(top)}',
-      if (left != null) 'left=${debugFormatDouble(left)}',
       if (width != null) 'width=${debugFormatDouble(width)}',
       if (height != null) 'height=${debugFormatDouble(height)}',
     ];
@@ -45,24 +39,19 @@ class RenderReactGrid extends RenderBox
     List<RenderBox> children,
     AlignmentGeometry alignment = AlignmentDirectional.topStart,
     TextDirection textDirection,
-    Overflow overflow = Overflow.clip,
   })  : assert(alignment != null),
-        assert(overflow != null),
         _crossAxisCount = crossAxisCount,
         _mainAxisSpacing = mainAxisSpacing,
         _crossAxisSpacing = crossAxisSpacing,
         _gridAspectRatio = gridAspectRatio,
         _alignment = alignment,
-        _textDirection = textDirection,
-        _overflow = overflow {
+        _textDirection = textDirection {
     addAll(children);
   }
 
   double mainAxisStride;
 
   double crossAxisStride;
-
-  bool _hasVisualOverflow = false;
 
   @override
   void setupParentData(RenderBox child) {
@@ -124,16 +113,6 @@ class RenderReactGrid extends RenderBox
     markNeedsLayout();
   }
 
-  Overflow get overflow => _overflow;
-  Overflow _overflow;
-  set overflow(Overflow value) {
-    assert(value != null);
-    if (_overflow != value) {
-      _overflow = value;
-      markNeedsPaint();
-    }
-  }
-
   static double getIntrinsicDimension(
       RenderBox firstChild, double mainChildSizeGetter(RenderBox child)) {
     double extent = 0.0;
@@ -176,45 +155,9 @@ class RenderReactGrid extends RenderBox
     return defaultComputeDistanceToHighestActualBaseline(baseline);
   }
 
-  static bool layoutReactPositionedChild(
-    RenderBox child,
-    ReactGridParentData childParentData,
-    Size size,
-  ) {
-    assert(child.parentData == childParentData);
-
-    /// size is size of ReactGrid
-
-    bool hasVisualOverflow = false;
-    BoxConstraints childConstraints = const BoxConstraints();
-
-    childConstraints = childConstraints.tighten(
-      width: childParentData.width,
-      height: childParentData.height,
-    );
-
-    child.layout(childConstraints, parentUsesSize: true);
-
-    double x;
-    x = childParentData.left;
-
-    if (x < 0.0 || x + child.size.width > size.width) hasVisualOverflow = true;
-
-    double y;
-    y = childParentData.top;
-
-    if (y < 0.0 || y + child.size.height > size.height)
-      hasVisualOverflow = true;
-
-    childParentData.offset = Offset(x, y);
-
-    return hasVisualOverflow;
-  }
-
   @override
   void performLayout() {
     final BoxConstraints constraints = this.constraints;
-    _hasVisualOverflow = false;
 
     // double width = constraints.minWidth;
     // double height = constraints.minHeight;
@@ -232,13 +175,13 @@ class RenderReactGrid extends RenderBox
       final ReactGridParentData childParentData =
           child.parentData as ReactGridParentData;
 
-      childParentData.left =
-          crossAxisStride * childParentData.crossAxisOffsetCellCount +
-              crossAxisSpacing / 2;
+      double left = crossAxisStride * childParentData.crossAxisOffsetCellCount +
+          crossAxisSpacing / 2;
 
-      childParentData.top =
-          mainAxisStride * childParentData.mainAxisOffsetCellCount +
-              mainAxisSpacing / 2;
+      double top = mainAxisStride * childParentData.mainAxisOffsetCellCount +
+          mainAxisSpacing / 2;
+
+      childParentData.offset = Offset(left, top);
 
       childParentData.width =
           childParentData.crossAxisCellCount * crossAxisStride -
@@ -247,9 +190,14 @@ class RenderReactGrid extends RenderBox
       childParentData.height =
           childParentData.mainAxisCellCount * mainAxisStride - mainAxisSpacing;
 
-      _hasVisualOverflow =
-          layoutReactPositionedChild(child, childParentData, size) ||
-              _hasVisualOverflow;
+      BoxConstraints childConstraints = const BoxConstraints();
+
+      childConstraints = childConstraints.tighten(
+        width: childParentData.width,
+        height: childParentData.height,
+      );
+
+      child.layout(childConstraints, parentUsesSize: true);
 
       assert(child.parentData == childParentData);
       child = childParentData.nextSibling;
@@ -261,24 +209,10 @@ class RenderReactGrid extends RenderBox
     return defaultHitTestChildren(result, position: position);
   }
 
-  @protected
-  void paintReactGrid(PaintingContext context, Offset offset) {
-    defaultPaint(context, offset);
-  }
-
   @override
   void paint(PaintingContext context, Offset offset) {
-    if (_overflow == Overflow.clip && _hasVisualOverflow) {
-      context.pushClipRect(
-          needsCompositing, offset, Offset.zero & size, paintReactGrid);
-    } else {
-      paintReactGrid(context, offset);
-    }
+    defaultPaint(context, offset);
   }
-
-  @override
-  Rect describeApproximatePaintClip(RenderObject child) =>
-      _hasVisualOverflow ? Offset.zero & size : null;
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -290,6 +224,5 @@ class RenderReactGrid extends RenderBox
     properties
         .add(DiagnosticsProperty<AlignmentGeometry>('alignment', alignment));
     properties.add(EnumProperty<TextDirection>('textDirection', textDirection));
-    properties.add(EnumProperty<Overflow>('overflow', overflow));
   }
 }

@@ -14,14 +14,11 @@ class ReactGrid extends MultiChildRenderObjectWidget {
     List<Widget> children = const <Widget>[],
     this.alignment = AlignmentDirectional.topStart,
     this.textDirection,
-    this.overflow = Overflow.clip,
   }) : super(key: key, children: children);
 
   final AlignmentGeometry alignment;
 
   final TextDirection textDirection;
-
-  final Overflow overflow;
 
   final int crossAxisCount;
 
@@ -41,7 +38,6 @@ class ReactGrid extends MultiChildRenderObjectWidget {
       gridAspectRatio: gridAspectRatio,
       alignment: alignment,
       textDirection: textDirection ?? Directionality.of(context),
-      overflow: overflow,
     );
   }
 
@@ -53,8 +49,7 @@ class ReactGrid extends MultiChildRenderObjectWidget {
       ..crossAxisSpacing = crossAxisSpacing
       ..gridAspectRatio = gridAspectRatio
       ..alignment = alignment
-      ..textDirection = textDirection ?? Directionality.of(context)
-      ..overflow = overflow;
+      ..textDirection = textDirection ?? Directionality.of(context);
   }
 
   @override
@@ -68,7 +63,6 @@ class ReactGrid extends MultiChildRenderObjectWidget {
         .add(DiagnosticsProperty<AlignmentGeometry>('alignment', alignment));
     properties.add(EnumProperty<TextDirection>('textDirection', textDirection,
         defaultValue: null));
-    properties.add(EnumProperty<Overflow>('overflow', overflow));
   }
 }
 

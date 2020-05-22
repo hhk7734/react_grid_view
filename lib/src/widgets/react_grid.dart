@@ -1,24 +1,34 @@
+import 'dart:collection';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/foundation.dart';
 
 import '../rendering/react_grid.dart';
 
-class ReactGrid extends MultiChildRenderObjectWidget {
+part './react_grid_element.dart';
+
+class ReactGrid extends RenderObjectWidget {
   ReactGrid({
     Key key,
     @required this.crossAxisCount,
     this.mainAxisSpacing = 0.0,
     this.crossAxisSpacing = 0.0,
     this.gridAspectRatio = 1.0,
-    List<Widget> children = const <Widget>[],
+    this.children = const <Widget>[],
     this.alignment = AlignmentDirectional.topStart,
     this.textDirection,
-  }) : super(key: key, children: children);
-
-  final AlignmentGeometry alignment;
-
-  final TextDirection textDirection;
+  })  : assert(children != null),
+        assert(() {
+          final int index = children.indexOf(null);
+          if (index >= 0) {
+            throw FlutterError(
+                "$runtimeType's children must not contain any null values, "
+                'but a null value was found at index $index');
+          }
+          return true;
+        }()), // https://github.com/dart-lang/sdk/issues/29276
+        super(key: key);
 
   final int crossAxisCount;
 
@@ -28,6 +38,17 @@ class ReactGrid extends MultiChildRenderObjectWidget {
 
   /// gridAspectRatio == crossAxisStride / mainAxisStride
   final double gridAspectRatio;
+
+  final List<Widget> children;
+
+  final AlignmentGeometry alignment;
+
+  final TextDirection textDirection;
+
+  @override
+  ReactGridElement createElement() {
+    return ReactGridElement(this);
+  }
 
   @override
   RenderReactGrid createRenderObject(BuildContext context) {

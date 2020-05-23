@@ -61,42 +61,51 @@ class ReactGridView extends StatefulWidget {
 class _ReactGridViewState extends State<ReactGridView> {
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double mainAxisStride =
-        width / widget.crossAxisCount / widget.gridAspectRatio;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double width;
+        double height = 0;
+        double mainAxisStride;
 
-    double height = 0;
-    widget.children.forEach((element) {
-      ReactPositioned child = element as ReactPositioned;
-      double _height =
-          (child.mainAxisCellCount + child.mainAxisOffsetCellCount + 1) *
-              mainAxisStride;
-      if (_height > height) height = _height;
-    });
+        if (widget.padding == null)
+          width = constraints.biggest.width;
+        else
+          width = constraints.biggest.width - widget.padding.horizontal;
 
-    return SingleChildScrollView(
-      key: widget.key,
-      scrollDirection: widget.scrollDirection,
-      reverse: widget.reverse,
-      padding: widget.padding,
-      primary: widget.primary,
-      physics: widget.physics,
-      controller: widget.controller,
-      dragStartBehavior: widget.dragStartBehavior,
-      child: Container(
-        width: width,
-        height: height,
-        child: ReactGrid(
+        mainAxisStride = width / widget.crossAxisCount / widget.gridAspectRatio;
+
+        widget.children.forEach((element) {
+          ReactPositioned child = element as ReactPositioned;
+          double _height =
+              (child.mainAxisCellCount + child.mainAxisOffsetCellCount + 1) *
+                  mainAxisStride;
+          if (_height > height) height = _height;
+        });
+
+        return SingleChildScrollView(
           key: widget.key,
-          crossAxisCount: widget.crossAxisCount,
-          mainAxisSpacing: widget.mainAxisSpacing,
-          crossAxisSpacing: widget.crossAxisSpacing,
-          gridAspectRatio: widget.gridAspectRatio,
-          children: widget.children,
-          alignment: widget.alignment,
-          textDirection: widget.textDirection ?? Directionality.of(context),
-        ),
-      ),
+          scrollDirection: widget.scrollDirection,
+          reverse: widget.reverse,
+          padding: widget.padding,
+          primary: widget.primary,
+          physics: widget.physics,
+          controller: widget.controller,
+          dragStartBehavior: widget.dragStartBehavior,
+          child: Container(
+            height: height,
+            child: ReactGrid(
+              key: widget.key,
+              crossAxisCount: widget.crossAxisCount,
+              mainAxisSpacing: widget.mainAxisSpacing,
+              crossAxisSpacing: widget.crossAxisSpacing,
+              gridAspectRatio: widget.gridAspectRatio,
+              children: widget.children,
+              alignment: widget.alignment,
+              textDirection: widget.textDirection ?? Directionality.of(context),
+            ),
+          ),
+        );
+      },
     );
   }
 }

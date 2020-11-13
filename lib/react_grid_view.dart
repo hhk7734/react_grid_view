@@ -1,7 +1,4 @@
 library react_grid_view;
 
-/// A Calculator.
-class Calculator {
-  /// Returns [value] plus 1.
-  int addOne(int value) => value + 1;
-}
+export 'src/view/view.dart';
+export 'src/bloc/react_grid_bloc.dart';

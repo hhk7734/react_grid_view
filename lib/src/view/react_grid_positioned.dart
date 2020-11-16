@@ -9,10 +9,19 @@ import 'package:react_grid_view/react_grid_view.dart';
 
 class ReactPositioned extends StatelessWidget {
   final Widget child;
-  final double top;
-  final double left;
+  final int crossAxisCount;
+  final int crossAxisOffsetCount;
+  final int mainAxisCount;
+  final int mainAxisOffsetCount;
 
-  ReactPositioned({this.child, this.top, this.left});
+  ReactPositioned({
+    Key key,
+    this.child,
+    this.crossAxisCount,
+    this.crossAxisOffsetCount,
+    this.mainAxisCount,
+    this.mainAxisOffsetCount,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,10 +30,16 @@ class ReactPositioned extends StatelessWidget {
         return true;
       },
       builder: (context, state) {
+        double _crossAxisStride =
+            context.select((ReactGridBloc bloc) => bloc.crossAxisStride);
+        double _mainAxisStride =
+            context.select((ReactGridBloc bloc) => bloc.mainAxisStride);
         return Positioned(
           child: child,
-          top: top,
-          left: left,
+          top: _mainAxisStride * mainAxisOffsetCount,
+          left: _crossAxisStride * crossAxisOffsetCount,
+          width: _crossAxisStride * crossAxisCount,
+          height: _mainAxisStride * mainAxisCount,
         );
       },
     );

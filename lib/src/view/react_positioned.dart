@@ -3,10 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:react_grid_view/react_grid_view.dart';
 
-// class ReactPositioned extends Positioned {
-//   ReactPositioned({Widget child}) : super(child: child);
-// }
-
 class ReactPositioned {
   final Widget child;
   int crossAxisCount;
@@ -30,6 +26,7 @@ class ReactGridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ReactGridItemOverlay overlay;
     return BlocBuilder<ReactGridBloc, ReactGridState>(
       buildWhen: (previous, current) {
         return true;
@@ -40,7 +37,24 @@ class ReactGridItem extends StatelessWidget {
         double _mainAxisStride =
             context.select((ReactGridBloc bloc) => bloc.mainAxisStride);
         return Positioned(
-          child: reactPositioned.child,
+          child: GestureDetector(
+            child: reactPositioned.child,
+            onLongPressStart: (details) {
+              overlay = ReactGridItemOverlay(
+                height: _mainAxisStride * reactPositioned.mainAxisCount,
+                initOffset: details.globalPosition - details.localPosition,
+                overlayState: Overlay.of(context, debugRequiredFor: this),
+                width: _crossAxisStride * reactPositioned.crossAxisCount,
+              );
+            },
+            onLongPressMoveUpdate: (details) {
+              overlay.onLongPressMoveUpdate(details);
+            },
+            onLongPressEnd: (details) {
+              overlay.close();
+              overlay = null;
+            },
+          ),
           top: _mainAxisStride * reactPositioned.mainAxisOffsetCount,
           left: _crossAxisStride * reactPositioned.crossAxisOffsetCount,
           width: _crossAxisStride * reactPositioned.crossAxisCount,
@@ -48,5 +62,55 @@ class ReactGridItem extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class ReactGridItemOverlay {
+  final double height;
+  final Offset initOffset;
+  Offset lastOffset;
+  OverlayEntry overlayEntry;
+  final OverlayState overlayState;
+  final double width;
+
+  ReactGridItemOverlay({
+    this.height,
+    this.initOffset,
+    @required this.overlayState,
+    this.width,
+  }) {
+    lastOffset = initOffset;
+    overlayEntry = OverlayEntry(builder: build);
+    overlayState.insert(overlayEntry);
+  }
+
+  void onLongPressMoveUpdate(LongPressMoveUpdateDetails details) {
+    lastOffset = initOffset + details.localOffsetFromOrigin;
+    overlayEntry.markNeedsBuild();
+  }
+
+  Widget build(BuildContext context) {
+    final RenderBox box = overlayState.context.findRenderObject() as RenderBox;
+    final Offset overlayTopLeft = box.localToGlobal(Offset.zero);
+    return Positioned(
+      left: lastOffset.dx - overlayTopLeft.dx,
+      top: lastOffset.dy - overlayTopLeft.dy,
+      child: IgnorePointer(
+        child: Opacity(
+          opacity: 0.5,
+          child: Container(
+            width: width,
+            height: height,
+            color: Colors.green,
+          ),
+        ),
+        ignoringSemantics: true,
+      ),
+    );
+  }
+
+  void close() {
+    overlayEntry.remove();
+    overlayEntry = null;
   }
 }

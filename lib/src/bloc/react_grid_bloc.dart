@@ -12,7 +12,7 @@ part 'react_grid_state.dart';
 
 class ReactGridBloc extends Bloc<ReactGridEvent, ReactGridState> {
   List<Widget> children = new List();
-  Map<UniqueKey, ReactPositioned> reactPositionedMap = new Map();
+  Map<Key, ReactPositioned> reactPositionedMap = new Map();
   int crossAxisCount;
   double crossAxisSpacing;
   double crossAxisStride;
@@ -42,12 +42,53 @@ class ReactGridBloc extends Bloc<ReactGridEvent, ReactGridState> {
 
   Stream<ReactGridState> _mapReactGridChildAddedToState(
       ReactGridChildAdded event) async* {
-    UniqueKey key = UniqueKey();
-    reactPositionedMap.putIfAbsent(key, () => event.reactPositioned);
-    children.add(ReactGridItem(
-      key: key,
-      reactPositioned: event.reactPositioned,
-    ));
-    yield ReactGridChildAddedSucces(children: children);
+    if (!_checkOverlap(event.reactPositioned, reactPositionedMap)) {
+      UniqueKey key = UniqueKey();
+      reactPositionedMap.putIfAbsent(key, () => event.reactPositioned);
+      children.add(ReactGridItem(
+        key: key,
+        reactPositioned: event.reactPositioned,
+      ));
+      yield ReactGridChildAddedSucces(children: children);
+    }
+  }
+
+  bool _checkOverlap(ReactPositioned reactPositioned,
+      Map<Key, ReactPositioned> reactPositionedMap,
+      [Key key]) {
+    for (var index in reactPositionedMap.keys) {
+      if (key != index) {
+        ReactPositioned positioned = reactPositionedMap[index];
+        int innerBottom;
+        int innerLeft;
+        int innerRight;
+        int innerTop;
+
+        innerBottom = reactPositioned.mainAxisCount +
+                    reactPositioned.mainAxisOffsetCount <
+                positioned.mainAxisCount + positioned.mainAxisOffsetCount
+            ? reactPositioned.mainAxisCount +
+                reactPositioned.mainAxisOffsetCount
+            : positioned.mainAxisCount + positioned.mainAxisOffsetCount;
+        innerTop =
+            reactPositioned.mainAxisOffsetCount > positioned.mainAxisOffsetCount
+                ? reactPositioned.mainAxisOffsetCount
+                : positioned.mainAxisOffsetCount;
+
+        innerLeft = reactPositioned.crossAxisOffsetCount >
+                positioned.crossAxisOffsetCount
+            ? reactPositioned.crossAxisOffsetCount
+            : positioned.crossAxisOffsetCount;
+        innerRight = reactPositioned.crossAxisCount +
+                    reactPositioned.crossAxisOffsetCount <
+                positioned.crossAxisCount + positioned.crossAxisOffsetCount
+            ? reactPositioned.crossAxisCount +
+                reactPositioned.crossAxisOffsetCount
+            : positioned.crossAxisCount + positioned.crossAxisOffsetCount;
+
+        if (innerBottom > innerTop && innerLeft < innerRight) return true;
+      }
+    }
+    return false;
   }
 }

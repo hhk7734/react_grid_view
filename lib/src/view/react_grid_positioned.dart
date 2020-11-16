@@ -7,21 +7,26 @@ import 'package:react_grid_view/react_grid_view.dart';
 //   ReactPositioned({Widget child}) : super(child: child);
 // }
 
-class ReactPositioned extends StatelessWidget {
+class ReactPositioned {
   final Widget child;
-  final int crossAxisCount;
-  final int crossAxisOffsetCount;
-  final int mainAxisCount;
-  final int mainAxisOffsetCount;
+  int crossAxisCount;
+  int crossAxisOffsetCount;
+  int mainAxisCount;
+  int mainAxisOffsetCount;
 
   ReactPositioned({
-    Key key,
     this.child,
     this.crossAxisCount,
     this.crossAxisOffsetCount,
     this.mainAxisCount,
     this.mainAxisOffsetCount,
-  }) : super(key: key);
+  });
+}
+
+class ReactGridItem extends StatelessWidget {
+  final ReactPositioned reactPositioned;
+
+  ReactGridItem({Key key, this.reactPositioned}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -35,11 +40,11 @@ class ReactPositioned extends StatelessWidget {
         double _mainAxisStride =
             context.select((ReactGridBloc bloc) => bloc.mainAxisStride);
         return Positioned(
-          child: child,
-          top: _mainAxisStride * mainAxisOffsetCount,
-          left: _crossAxisStride * crossAxisOffsetCount,
-          width: _crossAxisStride * crossAxisCount,
-          height: _mainAxisStride * mainAxisCount,
+          child: reactPositioned.child,
+          top: _mainAxisStride * reactPositioned.mainAxisOffsetCount,
+          left: _crossAxisStride * reactPositioned.crossAxisOffsetCount,
+          width: _crossAxisStride * reactPositioned.crossAxisCount,
+          height: _mainAxisStride * reactPositioned.mainAxisCount,
         );
       },
     );

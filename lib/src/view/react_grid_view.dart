@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:react_grid_view/react_grid_view.dart';
 
 class ReactGridView extends StatelessWidget {
-  final List<Widget> children;
+  final List<ReactPositioned> children;
   final int crossAxisCount;
   final double crossAxisSpacing;
   final double gridAspectRatio;
@@ -38,30 +38,57 @@ class ReactGridView extends StatelessWidget {
         }
 
         return BlocProvider<ReactGridBloc>(
-          create: (context) {
-            return ReactGridBloc(
-              crossAxisCount: crossAxisCount,
-              crossAxisSpacing: crossAxisSpacing,
-              crossAxisStride: _crossAxisStride,
-              gridAspectRatio: gridAspectRatio,
-              mainAxisCount: _mainAxisCount,
-              mainAxisSpacing: mainAxisSpacing,
-              mainAxisStride: _mainAxisStride,
-            );
-          },
+          create: (context) => ReactGridBloc(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: crossAxisSpacing,
+            crossAxisStride: _crossAxisStride,
+            gridAspectRatio: gridAspectRatio,
+            mainAxisCount: _mainAxisCount,
+            mainAxisSpacing: mainAxisSpacing,
+            mainAxisStride: _mainAxisStride,
+          ),
           child: BlocBuilder<ReactGridBloc, ReactGridState>(
+            buildWhen: (previous, current) {
+              if (current is ReactGridInitial) return true;
+              return false;
+            },
             builder: (context, state) {
+              children.forEach((ReactPositioned reactPositioned) {
+                context.select((ReactGridBloc bloc) => bloc.add(
+                    ReactGridChildAdded(reactPositioned: reactPositioned)));
+              });
               return SingleChildScrollView(
                 child: Container(
                   height: context.select((ReactGridBloc bloc) =>
                       bloc.mainAxisCount * bloc.mainAxisStride),
-                  child: Stack(
-                    children: children,
-                  ),
+                  child: _ReactGridViewStack(),
                 ),
               );
             },
           ),
+        );
+      },
+    );
+  }
+}
+
+class _ReactGridViewStack extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ReactGridBloc, ReactGridState>(
+      buildWhen: (previous, current) {
+        if (current is ReactGridInitial)
+          return true;
+        else if (current is ReactGridChildAddedSucces) return true;
+        return false;
+      },
+      builder: (context, state) {
+        if (state is ReactGridChildAddedSucces)
+          return Stack(
+            children: state.children,
+          );
+        return Stack(
+          children: [],
         );
       },
     );

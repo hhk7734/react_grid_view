@@ -44,6 +44,7 @@ class ReactGridBloc extends Bloc<ReactGridEvent, ReactGridState> {
 
   Stream<ReactGridState> _mapReactGridChildAddedToState(
       ReactGridChildAdded event) async* {
+    if (!_checkBeInStack(event.reactPositioned)) return;
     if (!_checkOverlap(event.reactPositioned, reactPositionedMap)) {
       UniqueKey key = UniqueKey();
       reactPositionedMap.putIfAbsent(key, () => event.reactPositioned);
@@ -57,6 +58,7 @@ class ReactGridBloc extends Bloc<ReactGridEvent, ReactGridState> {
 
   Stream<ReactGridState> _mapReactGridChildMovedToState(
       ReactGridChildMoved event) async* {
+    if (!_checkBeInStack(event.reactPositioned)) return;
     if (event.isEnd) {
       reactPositionedMap[event.key].setCountFromOther(event.reactPositioned);
     } else {
@@ -66,6 +68,15 @@ class ReactGridBloc extends Bloc<ReactGridEvent, ReactGridState> {
             [event.key], {event.key: event.reactPositioned});
       }
     }
+  }
+
+  bool _checkBeInStack(ReactPositioned reactPositioned) {
+    if (reactPositioned.crossAxisLeftOffsetCount < 0) return false;
+    if (reactPositioned.mainAxisTopOffsetCount < 0) return false;
+    if (reactPositioned.crossAxisRightOffsetCount > crossAxisCount)
+      return false;
+    if (reactPositioned.mainAxisBottomOffsetCount > mainAxisCount) return false;
+    return true;
   }
 
   bool _checkOverlap(ReactPositioned reactPositioned,

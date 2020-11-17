@@ -10,6 +10,9 @@ class ReactPositioned {
   int mainAxisCount;
   int mainAxisTopOffsetCount;
 
+  get crossAxisRightOffsetCount => crossAxisCount + crossAxisLeftOffsetCount;
+  get mainAxisBottomOffsetCount => mainAxisCount + mainAxisTopOffsetCount;
+
   ReactPositioned({
     this.child,
     this.crossAxisCount,

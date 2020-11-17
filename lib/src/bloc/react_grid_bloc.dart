@@ -79,12 +79,10 @@ class ReactGridBloc extends Bloc<ReactGridEvent, ReactGridState> {
         int innerRight;
         int innerTop;
 
-        innerBottom = reactPositioned.mainAxisCount +
-                    reactPositioned.mainAxisTopOffsetCount <
-                positioned.mainAxisCount + positioned.mainAxisTopOffsetCount
-            ? reactPositioned.mainAxisCount +
-                reactPositioned.mainAxisTopOffsetCount
-            : positioned.mainAxisCount + positioned.mainAxisTopOffsetCount;
+        innerBottom = reactPositioned.mainAxisBottomOffsetCount <
+                positioned.mainAxisBottomOffsetCount
+            ? reactPositioned.mainAxisBottomOffsetCount
+            : positioned.mainAxisBottomOffsetCount;
         innerTop = reactPositioned.mainAxisTopOffsetCount >
                 positioned.mainAxisTopOffsetCount
             ? reactPositioned.mainAxisTopOffsetCount
@@ -94,12 +92,10 @@ class ReactGridBloc extends Bloc<ReactGridEvent, ReactGridState> {
                 positioned.crossAxisLeftOffsetCount
             ? reactPositioned.crossAxisLeftOffsetCount
             : positioned.crossAxisLeftOffsetCount;
-        innerRight = reactPositioned.crossAxisCount +
-                    reactPositioned.crossAxisLeftOffsetCount <
-                positioned.crossAxisCount + positioned.crossAxisLeftOffsetCount
-            ? reactPositioned.crossAxisCount +
-                reactPositioned.crossAxisLeftOffsetCount
-            : positioned.crossAxisCount + positioned.crossAxisLeftOffsetCount;
+        innerRight = reactPositioned.crossAxisRightOffsetCount <
+                positioned.crossAxisRightOffsetCount
+            ? reactPositioned.crossAxisRightOffsetCount
+            : positioned.crossAxisRightOffsetCount;
 
         if (innerBottom > innerTop && innerLeft < innerRight) return true;
       }

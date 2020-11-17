@@ -17,6 +17,23 @@ class ReactPositioned {
     this.mainAxisCount,
     this.mainAxisOffsetCount,
   });
+
+  ReactPositioned copyWithoutChild() {
+    return ReactPositioned(
+      child: null,
+      crossAxisCount: crossAxisCount,
+      crossAxisOffsetCount: crossAxisOffsetCount,
+      mainAxisCount: mainAxisCount,
+      mainAxisOffsetCount: mainAxisOffsetCount,
+    );
+  }
+
+  void setCountFromOther(ReactPositioned other) {
+    crossAxisCount = other.crossAxisCount;
+    crossAxisOffsetCount = other.crossAxisOffsetCount;
+    mainAxisCount = other.mainAxisCount;
+    mainAxisOffsetCount = other.mainAxisOffsetCount;
+  }
 }
 
 class ReactGridItem extends StatelessWidget {

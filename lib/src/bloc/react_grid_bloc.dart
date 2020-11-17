@@ -80,26 +80,26 @@ class ReactGridBloc extends Bloc<ReactGridEvent, ReactGridState> {
         int innerTop;
 
         innerBottom = reactPositioned.mainAxisCount +
-                    reactPositioned.mainAxisOffsetCount <
-                positioned.mainAxisCount + positioned.mainAxisOffsetCount
+                    reactPositioned.mainAxisTopOffsetCount <
+                positioned.mainAxisCount + positioned.mainAxisTopOffsetCount
             ? reactPositioned.mainAxisCount +
-                reactPositioned.mainAxisOffsetCount
-            : positioned.mainAxisCount + positioned.mainAxisOffsetCount;
-        innerTop =
-            reactPositioned.mainAxisOffsetCount > positioned.mainAxisOffsetCount
-                ? reactPositioned.mainAxisOffsetCount
-                : positioned.mainAxisOffsetCount;
+                reactPositioned.mainAxisTopOffsetCount
+            : positioned.mainAxisCount + positioned.mainAxisTopOffsetCount;
+        innerTop = reactPositioned.mainAxisTopOffsetCount >
+                positioned.mainAxisTopOffsetCount
+            ? reactPositioned.mainAxisTopOffsetCount
+            : positioned.mainAxisTopOffsetCount;
 
-        innerLeft = reactPositioned.crossAxisOffsetCount >
-                positioned.crossAxisOffsetCount
-            ? reactPositioned.crossAxisOffsetCount
-            : positioned.crossAxisOffsetCount;
+        innerLeft = reactPositioned.crossAxisLeftOffsetCount >
+                positioned.crossAxisLeftOffsetCount
+            ? reactPositioned.crossAxisLeftOffsetCount
+            : positioned.crossAxisLeftOffsetCount;
         innerRight = reactPositioned.crossAxisCount +
-                    reactPositioned.crossAxisOffsetCount <
-                positioned.crossAxisCount + positioned.crossAxisOffsetCount
+                    reactPositioned.crossAxisLeftOffsetCount <
+                positioned.crossAxisCount + positioned.crossAxisLeftOffsetCount
             ? reactPositioned.crossAxisCount +
-                reactPositioned.crossAxisOffsetCount
-            : positioned.crossAxisCount + positioned.crossAxisOffsetCount;
+                reactPositioned.crossAxisLeftOffsetCount
+            : positioned.crossAxisCount + positioned.crossAxisLeftOffsetCount;
 
         if (innerBottom > innerTop && innerLeft < innerRight) return true;
       }

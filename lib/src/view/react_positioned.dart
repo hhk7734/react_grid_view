@@ -6,33 +6,33 @@ import 'package:react_grid_view/react_grid_view.dart';
 class ReactPositioned {
   final Widget child;
   int crossAxisCount;
-  int crossAxisOffsetCount;
+  int crossAxisLeftOffsetCount;
   int mainAxisCount;
-  int mainAxisOffsetCount;
+  int mainAxisTopOffsetCount;
 
   ReactPositioned({
     this.child,
     this.crossAxisCount,
-    this.crossAxisOffsetCount,
+    this.crossAxisLeftOffsetCount,
     this.mainAxisCount,
-    this.mainAxisOffsetCount,
+    this.mainAxisTopOffsetCount,
   });
 
   ReactPositioned copyWithoutChild() {
     return ReactPositioned(
       child: null,
       crossAxisCount: crossAxisCount,
-      crossAxisOffsetCount: crossAxisOffsetCount,
+      crossAxisLeftOffsetCount: crossAxisLeftOffsetCount,
       mainAxisCount: mainAxisCount,
-      mainAxisOffsetCount: mainAxisOffsetCount,
+      mainAxisTopOffsetCount: mainAxisTopOffsetCount,
     );
   }
 
   void setCountFromOther(ReactPositioned other) {
     crossAxisCount = other.crossAxisCount;
-    crossAxisOffsetCount = other.crossAxisOffsetCount;
+    crossAxisLeftOffsetCount = other.crossAxisLeftOffsetCount;
     mainAxisCount = other.mainAxisCount;
-    mainAxisOffsetCount = other.mainAxisOffsetCount;
+    mainAxisTopOffsetCount = other.mainAxisTopOffsetCount;
   }
 }
 
@@ -87,8 +87,8 @@ class _ReactGridItemState extends State<ReactGridItem> {
                 onLongPressMoveUpdate(details, context),
             onLongPressEnd: (details) => onLongPressEnd(details, context),
           ),
-          top: mainAxisStride * lastReactPositioned.mainAxisOffsetCount,
-          left: crossAxisStride * lastReactPositioned.crossAxisOffsetCount,
+          top: mainAxisStride * lastReactPositioned.mainAxisTopOffsetCount,
+          left: crossAxisStride * lastReactPositioned.crossAxisLeftOffsetCount,
           width: crossAxisStride * lastReactPositioned.crossAxisCount,
           height: mainAxisStride * lastReactPositioned.mainAxisCount,
         );
@@ -119,8 +119,8 @@ class _ReactGridItemState extends State<ReactGridItem> {
       moveMainOffsetCount = _currentMoveMainOffsetCount;
       ReactPositioned _reactPositioned =
           widget.reactPositioned.copyWithoutChild();
-      _reactPositioned.crossAxisOffsetCount += moveCrossOffsetCount;
-      _reactPositioned.mainAxisOffsetCount += moveMainOffsetCount;
+      _reactPositioned.crossAxisLeftOffsetCount += moveCrossOffsetCount;
+      _reactPositioned.mainAxisTopOffsetCount += moveMainOffsetCount;
 
       context.read<ReactGridBloc>().add(ReactGridChildMoved(
           key: widget.key, reactPositioned: _reactPositioned));

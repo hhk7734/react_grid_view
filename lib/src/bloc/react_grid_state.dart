@@ -18,3 +18,13 @@ class ReactGridChildAddedSucces extends ReactGridState {
   @override
   List<Object> get props => [children];
 }
+
+class ReactGridChildMovedSuccess extends ReactGridState {
+  final List<Key> keyList;
+  final Map<Key, ReactPositioned> reactPositionedMap;
+
+  const ReactGridChildMovedSuccess(this.keyList, this.reactPositionedMap);
+
+  @override
+  List<Object> get props => [keyList, reactPositionedMap];
+}

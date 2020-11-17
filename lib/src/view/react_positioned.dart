@@ -36,49 +36,106 @@ class ReactPositioned {
   }
 }
 
-class ReactGridItem extends StatelessWidget {
+class ReactGridItem extends StatefulWidget {
   final ReactPositioned reactPositioned;
 
   ReactGridItem({Key key, this.reactPositioned}) : super(key: key);
 
   @override
+  _ReactGridItemState createState() => _ReactGridItemState();
+}
+
+class _ReactGridItemState extends State<ReactGridItem> {
+  ReactGridItemOverlay overlay;
+
+  double crossAxisStride;
+  double mainAxisStride;
+
+  int moveCrossOffsetCount = 0;
+  int moveMainOffsetCount = 0;
+
+  ReactPositioned lastReactPositioned;
+
+  @override
   Widget build(BuildContext context) {
-    ReactGridItemOverlay overlay;
     return BlocBuilder<ReactGridBloc, ReactGridState>(
       buildWhen: (previous, current) {
-        return true;
+        if (current is ReactGridChildMovedSuccess) {
+          if (current.keyList.contains(widget.key)) {
+            return true;
+          }
+        }
+        return false;
       },
       builder: (context, state) {
-        double _crossAxisStride =
+        crossAxisStride =
             context.select((ReactGridBloc bloc) => bloc.crossAxisStride);
-        double _mainAxisStride =
+        mainAxisStride =
             context.select((ReactGridBloc bloc) => bloc.mainAxisStride);
+
+        if (state is ReactGridChildMovedSuccess) {
+          lastReactPositioned = state.reactPositionedMap[widget.key];
+        } else {
+          lastReactPositioned = widget.reactPositioned;
+        }
+
         return Positioned(
           child: GestureDetector(
-            child: reactPositioned.child,
-            onLongPressStart: (details) {
-              overlay = ReactGridItemOverlay(
-                height: _mainAxisStride * reactPositioned.mainAxisCount,
-                initOffset: details.globalPosition - details.localPosition,
-                overlayState: Overlay.of(context, debugRequiredFor: this),
-                width: _crossAxisStride * reactPositioned.crossAxisCount,
-              );
-            },
-            onLongPressMoveUpdate: (details) {
-              overlay.onLongPressMoveUpdate(details);
-            },
-            onLongPressEnd: (details) {
-              overlay.close();
-              overlay = null;
-            },
+            child: widget.reactPositioned.child,
+            onLongPressStart: (details) => onLongPressStart(details),
+            onLongPressMoveUpdate: (details) =>
+                onLongPressMoveUpdate(details, context),
+            onLongPressEnd: (details) => onLongPressEnd(details, context),
           ),
-          top: _mainAxisStride * reactPositioned.mainAxisOffsetCount,
-          left: _crossAxisStride * reactPositioned.crossAxisOffsetCount,
-          width: _crossAxisStride * reactPositioned.crossAxisCount,
-          height: _mainAxisStride * reactPositioned.mainAxisCount,
+          top: mainAxisStride * lastReactPositioned.mainAxisOffsetCount,
+          left: crossAxisStride * lastReactPositioned.crossAxisOffsetCount,
+          width: crossAxisStride * lastReactPositioned.crossAxisCount,
+          height: mainAxisStride * lastReactPositioned.mainAxisCount,
         );
       },
     );
+  }
+
+  void onLongPressStart(LongPressStartDetails details) {
+    overlay = ReactGridItemOverlay(
+      height: mainAxisStride * widget.reactPositioned.mainAxisCount,
+      initOffset: details.globalPosition - details.localPosition,
+      overlayState: Overlay.of(context, debugRequiredFor: widget),
+      width: crossAxisStride * widget.reactPositioned.crossAxisCount,
+    );
+  }
+
+  void onLongPressMoveUpdate(
+      LongPressMoveUpdateDetails details, BuildContext context) {
+    overlay.onLongPressMoveUpdate(details);
+    int _currentMoveCrossOffsetCount =
+        (details.localOffsetFromOrigin.dx / crossAxisStride).round();
+    int _currentMoveMainOffsetCount =
+        (details.localOffsetFromOrigin.dy / mainAxisStride).round();
+
+    if (_currentMoveCrossOffsetCount != moveCrossOffsetCount ||
+        _currentMoveMainOffsetCount != moveMainOffsetCount) {
+      moveCrossOffsetCount = _currentMoveCrossOffsetCount;
+      moveMainOffsetCount = _currentMoveMainOffsetCount;
+      ReactPositioned _reactPositioned =
+          widget.reactPositioned.copyWithoutChild();
+      _reactPositioned.crossAxisOffsetCount += moveCrossOffsetCount;
+      _reactPositioned.mainAxisOffsetCount += moveMainOffsetCount;
+
+      context.read<ReactGridBloc>().add(ReactGridChildMoved(
+          key: widget.key, reactPositioned: _reactPositioned));
+    }
+  }
+
+  void onLongPressEnd(LongPressEndDetails details, BuildContext context) {
+    overlay.close();
+    overlay = null;
+
+    moveCrossOffsetCount = 0;
+    moveMainOffsetCount = 0;
+
+    context.read<ReactGridBloc>().add(ReactGridChildMoved(
+        key: widget.key, reactPositioned: lastReactPositioned, isEnd: true));
   }
 }
 

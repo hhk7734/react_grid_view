@@ -37,6 +37,8 @@ class ReactGridBloc extends Bloc<ReactGridEvent, ReactGridState> {
   ) async* {
     if (event is ReactGridChildAdded) {
       yield* _mapReactGridChildAddedToState(event);
+    } else if (event is ReactGridChildMoved) {
+      yield* _mapReactGridChildMovedToState(event);
     }
   }
 
@@ -50,6 +52,19 @@ class ReactGridBloc extends Bloc<ReactGridEvent, ReactGridState> {
         reactPositioned: event.reactPositioned,
       ));
       yield ReactGridChildAddedSucces(children: children);
+    }
+  }
+
+  Stream<ReactGridState> _mapReactGridChildMovedToState(
+      ReactGridChildMoved event) async* {
+    if (event.isEnd) {
+      reactPositionedMap[event.key].setCountFromOther(event.reactPositioned);
+    } else {
+      if (!_checkOverlap(
+          event.reactPositioned, reactPositionedMap, event.key)) {
+        yield ReactGridChildMovedSuccess(
+            [event.key], {event.key: event.reactPositioned});
+      }
     }
   }
 
